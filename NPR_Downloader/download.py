@@ -24,7 +24,7 @@ class downloader(threading.Thread):
             if not self.que.empty():
                 print('-----%s------' % (self.name))
                 file_url=self.que.get()
-                os.system('wget --output-document=./download/' + urlparse.urlparse(file_url).path.split('/')[-1] + " " + file_url)
+                os.system('curl -o ./download/' + urlparse.urlparse(file_url).path.split('/')[-1] + " " + file_url)
             else:
                 break
 
