@@ -12,9 +12,11 @@ import httplib
 from datetime import date
 from datetime import datetime
 import getopt
+import platform
 
 
 class downloader(threading.Thread):
+    global download_command
     def __init__(self, que):
         threading.Thread.__init__(self)
         self.que = que
@@ -24,10 +26,12 @@ class downloader(threading.Thread):
             if not self.que.empty():
                 print('-----%s------' % (self.name))
                 file_url=self.que.get()
-                os.system('curl -o ./download/' + urlparse.urlparse(file_url).path.split('/')[-1] + " " + file_url)
+                os.system(download_command + ' -o ./download/' + urlparse.urlparse(file_url).path.split('/')[-1] + " " + file_url)
             else:
                 break
 
+def getSystemInfo():
+    return platform.system()
 
 def getHeader(ourl):
     url = urlparse.urlparse(ourl)
@@ -86,6 +90,7 @@ if __name__ == '__main__':
         sys.exit(2)
     programs = None
     download_date = None
+    download_command = None
     task = 1
     for o, a in opts:
         if o in ("-v", "--version"):
@@ -108,6 +113,16 @@ if __name__ == '__main__':
     if programs == None:
         programs="me,atc,fa,tmm,ama,ted,waitwait"
     # ...
+    
+    # check os info
+    osStr=getSystemInfo()
+    if (osStr=="Windows"):  #for windows
+        download_command='wget'
+    elif (osStr=="Darwin"): # for mac
+        download_command='curl'
+    else:   # for linux distro
+        download_command='wget'
+        
 
     # check directory exist
     if not os.path.isdir(__DEFAULT_DOWNLOAD_DIR__):
