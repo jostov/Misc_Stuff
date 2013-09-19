@@ -42,5 +42,7 @@ Thumbs.db
 .settings/
 .project
 .pydevproject
-.idea
+.idea/
+NPR_Downloader/.idea/workspace.xml
 download/
+*/workspace.xml
