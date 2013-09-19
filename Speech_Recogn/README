@@ -1,0 +1,12 @@
+Description:
+
+speech_sample.pl, from Mike Pultz. Great thanks to this little perl script!
+
+upload_audio.py, by me. Currently experimental. Need to install python requests lib.
+
+
+Usage:
+
+speech_sample.pl YourAudioRecord.flac
+
+upload_audio.py YourAudioRecord.flac
