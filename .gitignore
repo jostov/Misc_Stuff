@@ -39,8 +39,12 @@ Thumbs.db
 # Custom Ignore Files #
 #######################
 
-**/.settings
-**/.project
-**/.pydevproject
-**/.idea
+.settings
+.settings/*
+.project
+.pydevproject
+.idea/
 download/
+*.flac
+*.wav
+
