@@ -43,7 +43,8 @@ Thumbs.db
 .settings/*
 .project
 .pydevproject
-.idea/
+.idea
+.idea/*
 download/
 *.flac
 *.wav
