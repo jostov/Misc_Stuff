@@ -2,7 +2,8 @@
 
 require LWP::UserAgent;
 
-my $url = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang=en-US";
+#my $url = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang=en-US";
+my $url = "http://httpbin.org/post";
 my $audio = "";
 
 open(FILE, "<" . $ARGV[0]);

@@ -39,10 +39,8 @@ Thumbs.db
 # Custom Ignore Files #
 #######################
 
-.settings/
-.project
-.pydevproject
-.idea/
-NPR_Downloader/.idea/workspace.xml
+**/.settings
+**/.project
+**/.pydevproject
+**/.idea
 download/
-*/workspace.xml
