@@ -40,11 +40,11 @@ Thumbs.db
 #######################
 
 .settings
-.settings/*
 .project
 .pydevproject
 .idea
-.idea/*
+workspace.xml
+tasks.xml
 download/
 *.flac
 *.wav
