@@ -2,7 +2,6 @@
 # -*- coding: utf8 -*-
 __author__ = 'fucckz'
 __version__ = '0.1'
-__DEFAULT_DOWNLOAD_DIR__ = "./download"
 import sys
 import Queue
 import threading
@@ -26,7 +25,7 @@ class downloader(threading.Thread):
             if not self.que.empty():
                 print('-----%s------' % (self.name))
                 file_url=self.que.get()
-                os.system(download_command + ' -o ./download/' + urlparse.urlparse(file_url).path.split('/')[-1] + " " + file_url)
+                os.system(download_command + ' ' + download_output + urlparse.urlparse(file_url).path.split('/')[-1] + " " + file_url)
             else:
                 break
 
@@ -60,7 +59,7 @@ def generateList_NPR(programs):
         i = 1
         while True:
             url_temp = url_left + str(i).rjust(2, '0') + url_right
-            if (os.path.exists("./download/" + urlparse.urlparse(url_temp).path.split('/')[-1])):
+            if (os.path.exists(download_output + urlparse.urlparse(url_temp).path.split('/')[-1])):
                 i += 1
                 continue
 
@@ -83,7 +82,7 @@ if __name__ == '__main__':
     # process parameters
     # TODO: add -k --keep_output_structure, -c --clear_download_folder
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "d:hvp:t:", ["date=", "help", "version", "program=", "task="])
+        opts, args = getopt.getopt(sys.argv[1:], "d:hvp:t:o:", ["date=", "help", "version", "program=", "task=", "-output-document="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -91,6 +90,7 @@ if __name__ == '__main__':
     programs = None
     download_date = None
     download_command = None
+    download_output = None
     task = 1
     for o, a in opts:
         if o in ("-v", "--version"):
@@ -103,31 +103,36 @@ if __name__ == '__main__':
             programs = a
         elif o in ("-d", "--date"):
             download_date = a
-            download_date = datetime.strptime(download_date, "%d%m%y").date()
+            download_date = datetime.strptime(download_date, "%m%d%y").date()
         elif o in ("-t", "--task"):
             task=int(a)
             print("multi-task downlod: " + a)
+        elif o in ("-o", "--output-document"):
+            download_output = a
         else:
             assert False, "unhandled option"
 
+    # default values
     if programs == None:
         programs="me,atc,fa,tmm,ama,ted,waitwait"
+    if download_output == None:
+        download_output='./download/'
     # ...
     
     # check os info
     osStr=getSystemInfo()
     if (osStr=="Windows"):  #for windows
-        download_command='wget'
+        download_command='wget -O'  #same as "--output-document=file"
     elif (osStr=="Darwin"): # for mac
-        download_command='curl'
+        download_command='curl -o'
     else:   # for linux distro
-        download_command='wget'
+        download_command='wget -O'
         
 
     # check directory exist
-    if not os.path.isdir(__DEFAULT_DOWNLOAD_DIR__):
-        print("download directory doesn't exist, create one at: " + __DEFAULT_DOWNLOAD_DIR__)
-        os.makedirs(__DEFAULT_DOWNLOAD_DIR__)
+    if not os.path.isdir(download_output[:-1]):
+        print("download directory doesn't exist, create one at: " + download_output[:-1])
+        os.makedirs(download_output[:-1])
 
     # download...
     dQueue = generateList_NPR(programs)
