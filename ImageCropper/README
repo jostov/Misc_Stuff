@@ -1,0 +1,7 @@
+Description:
+
+imgcrop.py - batch cropping images
+
+Librarys:
+
+PIL v1.1.7+

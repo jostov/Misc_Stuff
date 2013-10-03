@@ -48,4 +48,5 @@ tasks.xml
 download/
 *.flac
 *.wav
-
+Input/
+Output/
