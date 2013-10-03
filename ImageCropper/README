@@ -1,7 +1,10 @@
 Description:
 
 imgcrop.py - batch cropping images
+imgconv.py - batch convert G4 TIFF into JPEG, requires pgmagick
+
 
 Librarys:
 
 PIL v1.1.7+
+pgmagick v0.5.7+
