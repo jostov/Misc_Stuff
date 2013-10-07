@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
 __author__ = 'fucckz'
-__version__ = '0.1'
+__version__ = '0.2'
 import sys
 import Queue
 import threading
@@ -12,10 +12,12 @@ from datetime import date
 from datetime import datetime
 import getopt
 import platform
+import pyDownloader
 
 
 class downloader(threading.Thread):
     global download_command
+
     def __init__(self, que):
         threading.Thread.__init__(self)
         self.que = que
@@ -24,13 +26,19 @@ class downloader(threading.Thread):
         while True:
             if not self.que.empty():
                 print('-----%s------' % (self.name))
-                file_url=self.que.get()
-                os.system(download_command + ' ' + download_output + urlparse.urlparse(file_url).path.split('/')[-1] + " " + file_url)
+                file_url = self.que.get()
+                if (download_command != None):
+                    os.system(download_command + ' ' + download_output + urlparse.urlparse(file_url).path.split('/')[
+                        -1] + " " + file_url)
+                else:
+                    pyDownloader.download(file_url)
             else:
                 break
 
+
 def getSystemInfo():
     return platform.system()
+
 
 def getHeader(ourl):
     url = urlparse.urlparse(ourl)
@@ -46,13 +54,14 @@ def generateList_NPR(programs):
     dQueue = Queue.Queue()
     # puts Hourly News Summary into queue
     dQueue.put("http://public.npr.org/anon.npr-mp3/npr/news/newscast.mp3")
-    if (download_date==None):
+    if (download_date == None):
         download_date = date.today()
-    programs=programs.split(',')
+    programs = programs.split(',')
     for program in programs:
-        program=program.strip()
+        program = program.strip()
         print "checking program: " + program
-        url_left = "http://pd.npr.org/anon.npr-mp3/npr/" + program + download_date.strftime("/%Y/%m/%Y%m%d_") + program + "_"
+        url_left = "http://pd.npr.org/anon.npr-mp3/npr/" + program + download_date.strftime(
+            "/%Y/%m/%Y%m%d_") + program + "_"
         url_right = ".mp3"
 
         # check url availability
@@ -82,7 +91,8 @@ if __name__ == '__main__':
     # process parameters
     # TODO: add -k --keep_output_structure, -c --clear_download_folder
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "d:hvp:t:o:", ["date=", "help", "version", "program=", "task=", "-output-document="])
+        opts, args = getopt.getopt(sys.argv[1:], "d:hvp:t:o:",
+                                   ["date=", "help", "version", "program=", "task=", "-output-document="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -105,7 +115,7 @@ if __name__ == '__main__':
             download_date = a
             download_date = datetime.strptime(download_date, "%m%d%y").date()
         elif o in ("-t", "--task"):
-            task=int(a)
+            task = int(a)
             print("multi-task downlod: " + a)
         elif o in ("-o", "--output-document"):
             download_output = a
@@ -114,20 +124,30 @@ if __name__ == '__main__':
 
     # default values
     if programs == None:
-        programs="me,atc,fa,tmm,ama,ted,waitwait"
+        programs = "me,atc,fa,tmm,ama,ted,waitwait"
     if download_output == None:
-        download_output='./download/'
-    # ...
-    
+        download_output = './download/'
+        # ...
+
     # check os info
-    osStr=getSystemInfo()
-    if (osStr=="Windows"):  #for windows
-        download_command='wget -O'  #same as "--output-document=file"
-    elif (osStr=="Darwin"): # for mac
-        download_command='curl -o'
-    else:   # for linux distro
-        download_command='wget -O'
-        
+    osStr = getSystemInfo()
+    if (osStr == "Windows"):  #for windows
+        download_command = 'wget -O'  #same as "--output-document=file"
+    elif (osStr == "Darwin"): # for mac
+        download_command = 'curl -o'
+    elif (osStr == "Linux"):   # for linux distros
+        try:
+            import androidhelper
+        except:
+            download_command = 'wget -O'
+        else:
+            # on Android QPython
+            osStr = 'Android'
+            download_command = None
+    else: # unknow system...
+        osStr = 'Unknown'
+        download_command = 'wget -O'
+    print osStr
 
     # check directory exist
     if not os.path.isdir(download_output[:-1]):
@@ -137,6 +157,6 @@ if __name__ == '__main__':
     # download...
     dQueue = generateList_NPR(programs)
     for i in range(task):
-        d=downloader(dQueue)
+        d = downloader(dQueue)
         d.start()
     print("FINISH")

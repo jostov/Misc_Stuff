@@ -1,1 +1,1 @@
-download.py -t 3
+npr.py -t 3
