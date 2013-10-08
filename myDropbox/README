@@ -1,0 +1,20 @@
+myDropbox --- A Lightweight Python Library For Managing Your Dropbox's Files
+
+
+----------------------------------
+File Structure
+
+    auth_files/         -   store authentication files for OAuth2
+    dropbox/            -   dropbox-python-sdk-1.6
+    myDropbox.py        -   myDropbox python library
+    test_download.py    -   test downloading function, as well examine token's validation
+
+----------------------------------
+How to Get Dropbox token
+
+    Simply run myDropbox.py, follow the instructions, a token_store.txt will be automatically generated.
+
+----------------------------------
+Library Reference
+
+    ...to be added...

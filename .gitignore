@@ -50,3 +50,5 @@ download/
 *.wav
 Input/
 Output/
+test.mp3
+token_store.txt
