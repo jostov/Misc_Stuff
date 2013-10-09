@@ -91,8 +91,8 @@ if __name__ == '__main__':
     # process parameters
     # TODO: add -k --keep_output_structure, -c --clear_download_folder
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "d:hvp:t:o:",
-                                   ["date=", "help", "version", "program=", "task=", "-output-document="])
+        opts, args = getopt.getopt(sys.argv[1:], "d:hvp:t:o:n",
+                                   ["date=", "help", "version", "program=", "task=", "-output-document=", "not-upload"])
     except getopt.GetoptError as err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -101,6 +101,7 @@ if __name__ == '__main__':
     download_date = None
     download_command = None
     download_output = None
+    needs_upload = True
     task = 1
     for o, a in opts:
         if o in ("-v", "--version"):
@@ -119,6 +120,8 @@ if __name__ == '__main__':
             print("multi-task downlod: " + a)
         elif o in ("-o", "--output-document"):
             download_output = a
+        elif o in ("-n", "--not-upload"):
+            needs_upload = False
         else:
             assert False, "unhandled option"
 
@@ -156,7 +159,20 @@ if __name__ == '__main__':
 
     # download...
     dQueue = generateList_NPR(programs)
+    threads=[]
     for i in range(task):
         d = downloader(dQueue)
+        threads.append(d)
         d.start()
+    print("---download finish!---")
+
+    # wait till all the threads will
+    for thread in threads:
+        thread.join()
+
+    # upload...
+    if (needs_upload==True):
+        import subprocess
+        subprocess.Popen("DBupload.py", shell=True)
+
     print("FINISH")

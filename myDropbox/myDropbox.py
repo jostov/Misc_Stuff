@@ -10,9 +10,10 @@ from dropbox import client, rest
 
 
 class DropboxTerm():
-    TOKEN_FILE = "auth_files/token_store.txt"
-    APP_KEY_FILE = "auth_files/app_key_store.txt"
-    APP_SECRET_FILE = "auth_files/app_secret_store.txt"
+    ABS_PATH = os.path.dirname(os.path.abspath(__file__)) + "/"
+    TOKEN_FILE = ABS_PATH + "auth_files/token_store.txt"
+    APP_KEY_FILE = ABS_PATH + "auth_files/app_key_store.txt"
+    APP_SECRET_FILE = ABS_PATH + "auth_files/app_secret_store.txt"
 
     def __init__(self, login=False):
         """
@@ -187,17 +188,17 @@ class DropboxTerm():
         to_file.write(f.read())
 
 
-    def do_put(self, from_path, to_path):
+    def do_put(self, from_path, to_path, overwrite=False):
         """
         Copy local file to Dropbox
 
         """
         from_file = open(os.path.expanduser(from_path), "rb")
 
-        self.api_client.put_file(self.current_path + "/" + to_path, from_file)
+        self.api_client.put_file(self.current_path + "/" + to_path, from_file, overwrite)
 
 
-    def do_put_by_chunks(self, from_path, to_path, chunk_size):
+    def do_put_by_chunks(self, from_path, to_path, chunk_size, overwrite=False):
         """
         Copy local file to Dropbox by chuncks
 
@@ -216,7 +217,7 @@ class DropboxTerm():
             except rest.ErrorResponse, e:
                 # perform error handling and retry logic
                 print e
-        uploader.finish(self.current_path + "/" + to_path, True)
+        uploader.finish(self.current_path + "/" + to_path, overwrite)
 
 
     def do_search(self, string):
