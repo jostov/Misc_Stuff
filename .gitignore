@@ -52,3 +52,5 @@ Input/
 Output/
 test.mp3
 token_store.txt
+*.pyc
+*.pyo
