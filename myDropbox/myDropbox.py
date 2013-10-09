@@ -8,10 +8,11 @@ import sys
 
 from dropbox import client, rest
 
+
 class DropboxTerm():
-    TOKEN_FILE = "auth_files\\token_store.txt"
-    APP_KEY_FILE = "auth_files\\app_key_store.txt"
-    APP_SECRET_FILE = "auth_files\\app_secret_store.txt"
+    TOKEN_FILE = "auth_files/token_store.txt"
+    APP_KEY_FILE = "auth_files/app_key_store.txt"
+    APP_SECRET_FILE = "auth_files/app_secret_store.txt"
 
     def __init__(self, login=False):
         """
@@ -23,7 +24,7 @@ class DropboxTerm():
         self.app_key = None
         self.app_secret = None
 
-        if (login==True):
+        if (login == True):
             # read app key
             try:
                 appkey = open(self.APP_KEY_FILE).read()
@@ -31,7 +32,7 @@ class DropboxTerm():
                 print "[loaded app key]"
             except IOError:
                 exit("Error: app_key_store.txt missing!")
-            # read app secret
+                # read app secret
             try:
                 appsecret = open(self.APP_SECRET_FILE).read()
                 self.app_secret = appsecret
@@ -39,13 +40,13 @@ class DropboxTerm():
             except IOError:
                 exit("Error: app_secret_store.txt missing!")
 
-
-
         try:
             token = open(self.TOKEN_FILE).read()
             self.api_client = client.DropboxClient(token)
             print "[loaded access token]"
-        except IOError:
+        except IOError as err:
+            print os.getcwd()
+            print err
             exit("Error: token_store.txt missing!")
 
     def do_ls(self):
@@ -136,8 +137,6 @@ class DropboxTerm():
         """
         Copy file from Dropbox to local file and print out the metadata.
 
-        Examples:
-        Dropbox> get file.txt ~/dropbox-file.txt
         """
         to_file = open(os.path.expanduser(to_path), "wb")
 
@@ -145,6 +144,32 @@ class DropboxTerm():
         print 'Metadata:', metadata
         to_file.write(f.read())
 
+    def do_get_by_chunks(self, from_path, to_path, chuncksize):
+        """
+        Copy file from Dropbox to local file and print out the metadata by chunks.
+
+        """
+        to_file = open(os.path.expanduser(to_path), "wb")
+
+        from_path = self.current_path + "/" + from_path
+        f, metadata = self.api_client.get_file_and_metadata(from_path)
+        # print 'Metadata:', metadata
+        file_size = metadata['bytes']
+        print "Downloading: %s Bytes: %s" % (from_path, file_size)
+
+        file_size_dl = 0
+        while True:
+            buffer = f.read(chuncksize)
+            if not buffer:
+                break
+            file_size_dl += len(buffer)
+            to_file.write(buffer)
+            status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+            # status = status + chr(8)*(len(status)+1)
+            status += chr(13)
+            print status,
+        print ''
+        to_file.close()
 
     def do_thumbnail(self, from_path, to_path, size='large', format='JPEG'):
         """
@@ -157,7 +182,7 @@ class DropboxTerm():
         to_file = open(os.path.expanduser(to_path), "wb")
 
         f, metadata = self.api_client.thumbnail_and_metadata(
-                self.current_path + "/" + from_path, size, format)
+            self.current_path + "/" + from_path, size, format)
         print 'Metadata:', metadata
         to_file.write(f.read())
 
@@ -166,12 +191,32 @@ class DropboxTerm():
         """
         Copy local file to Dropbox
 
-        Examples:
-        Dropbox> put ~/test.txt dropbox-copy-test.txt
         """
         from_file = open(os.path.expanduser(from_path), "rb")
 
         self.api_client.put_file(self.current_path + "/" + to_path, from_file)
+
+
+    def do_put_by_chunks(self, from_path, to_path, chunk_size):
+        """
+        Copy local file to Dropbox by chuncks
+
+        """
+
+        # get file size
+        from_file = open(os.path.expanduser(from_path), "rb")
+        from_file.seek(0, 2)
+        size = from_file.tell()
+        from_file.seek(0)
+
+        uploader = self.api_client.get_chunked_uploader(from_file, size)
+        while uploader.offset < size:
+            try:
+                upload = uploader.upload_chunked(chunk_size)
+            except rest.ErrorResponse, e:
+                # perform error handling and retry logic
+                print e
+        uploader.finish(self.current_path + "/" + to_path, True)
 
 
     def do_search(self, string):
@@ -212,8 +257,6 @@ class DropboxTerm():
             return parts[0], parts[1:], line
 
 
-
-
 if __name__ == '__main__':
     term = DropboxTerm(True)
     while True:
@@ -224,4 +267,4 @@ if __name__ == '__main__':
         else:
             break
     print "See 'auth_files/token_store.txt' for token detail, press any key to continue..."
-    a=raw_input()
+    a = raw_input()
