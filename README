@@ -1,7 +1,7 @@
-* NPR_Downloader -- Auto Download Everyday's NPR Audio To Your Mobile Devices
+* NPR_Downloader --- Auto Download Everyday's NPR Audio To Your Mobile Devices
 
-* Speech_Recogn -- Speech2Text, Using Google's Speech Recognition API
+* Speech_Recogn --- Speech2Text, Using Google's Speech Recognition API
 
-* ImageCroppoer -- Processing Images In Batch
+* ImageCroppoer --- Processing Images In Batch
 
-* myDropBox -- A Python Library For Managing Your Dropbox's Files
+* myDropBox --- A Python Library For Managing Your Dropbox's Files

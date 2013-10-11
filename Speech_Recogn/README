@@ -1,12 +1,14 @@
-Description:
-
-speech_sample.pl, from Mike Pultz. Great thanks to this little perl script!
-
-upload_audio.py, by me. Currently experimental. Need to install python requests lib.
+SpeechRecogn --- Translate your speech into text, Using Google's Speech Recognition API
 
 
-Usage:
+----------------------------------
+File Structure
 
-speech_sample.pl YourAudioRecord.flac
+	speech_sample.pl	-	From Mike Pultz. Can be use as a reference of Google's API
+	upload_audio.py		-	Currently experimental. Need to install requests module.
 
-upload_audio.py YourAudioRecord.flac
+----------------------------------
+Usage
+
+	speech_sample.pl YourAudioRecord.flac
+	upload_audio.py YourAudioRecord.flac
