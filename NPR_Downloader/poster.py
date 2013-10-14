@@ -14,6 +14,7 @@ def do_patch_http_response_read():
     but due implementation errors they wrongly close session and urllib raise error.
     This will allows you to deal with defective http servers and fix httplib.IncompleteRead error.
     """
+
     def patch_http_response_read(func):
         def inner(*args):
             try:
@@ -22,6 +23,7 @@ def do_patch_http_response_read():
                 return e.partial
 
         return inner
+
     httplib.HTTPResponse.read = patch_http_response_read(httplib.HTTPResponse.read)
 
 
@@ -37,7 +39,7 @@ def post_multipart(host, port, selector, fields, files):
     headers = {
         'User-Agent': 'poster poster poster',
         'Content-Type': content_type
-        }
+    }
     h.request('POST', selector, body, headers)
     res = h.getresponse()
     return res

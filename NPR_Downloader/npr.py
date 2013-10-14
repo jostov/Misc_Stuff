@@ -31,7 +31,7 @@ class downloader(threading.Thread):
                     os.system(download_command + ' ' + download_output + urlparse.urlparse(file_url).path.split('/')[
                         -1] + " " + file_url)
                 else:
-                    pyDownloader.download(file_url)
+                    pyDownloader.download(file_url, download_output + urlparse.urlparse(file_url).path.split('/')[-1])
             else:
                 break
 
@@ -91,8 +91,8 @@ if __name__ == '__main__':
     # process parameters
     # TODO: add -k --keep_output_structure, -c --clear_download_folder
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "d:hvp:t:o:n",
-                                   ["date=", "help", "version", "program=", "task=", "-output-document=", "not-upload"])
+        opts, args = getopt.getopt(sys.argv[1:], "d:hvp:t:o:u:",
+                                   ["date=", "help", "version", "program=", "task=", "-output-document=", "upload="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -101,7 +101,7 @@ if __name__ == '__main__':
     download_date = None
     download_command = None
     download_output = None
-    needs_upload = True
+    upload_to = None
     task = 1
     for o, a in opts:
         if o in ("-v", "--version"):
@@ -120,8 +120,8 @@ if __name__ == '__main__':
             print("multi-task downlod: " + a)
         elif o in ("-o", "--output-document"):
             download_output = a
-        elif o in ("-n", "--not-upload"):
-            needs_upload = False
+        elif o in ("-u", "--upload"):
+            upload_to = a
         else:
             assert False, "unhandled option"
 
@@ -130,6 +130,8 @@ if __name__ == '__main__':
         programs = "me,atc,fa,tmm,ama,ted,waitwait"
     if download_output == None:
         download_output = './download/'
+    if upload_to == None:
+        upload_to = "filemanager,dropbox"
         # ...
 
     # check os info
@@ -150,7 +152,7 @@ if __name__ == '__main__':
     else: # unknow system...
         osStr = 'Unknown'
         download_command = 'wget -O'
-    print osStr
+    print "OS: ", osStr
 
     # check directory exist
     if not os.path.isdir(download_output[:-1]):
@@ -171,8 +173,20 @@ if __name__ == '__main__':
         thread.join()
 
     # upload...
-    if (needs_upload==True):
+    if (upload_to != None or upload_to != ""):
         import subprocess
-        subprocess.Popen("DBupload.py", shell=True)
+        def run_script(script_path):
+            if osStr=='Windows':
+                subprocess.Popen(script_path, shell=True).wait()
+            else:
+                # for linux-like os specification
+                subprocess.Popen(['python',script_path]).wait()
+
+        upload_to = upload_to.split(',')
+        for remote in upload_to:
+            if remote == 'dropbox':
+                run_script('DBupload.py')
+            elif remote == 'filemanager':
+                run_script('FMupload.py')
 
     print("FINISH")

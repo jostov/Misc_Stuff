@@ -7,29 +7,36 @@ import poster
 
 class FMuploader():
     def __init__(self):
-        poster.do_patch_http_response_read()
+        self.host=""
+        # poster.do_patch_http_response_read()    # patch http.response.read() function
         print "[FMuploader Init]"
 
     def search_lan_for_devices(self):
+        self.host = "192.168.1.8"
         # TODO: add this part
         print ""
 
-    def post_multi_encoded_file(self, file_path):\
-        # TODO: remove hardcode variables
-        host = "192.168.1.8"
+    def post_multi_encoded_file(self, file_path, remote_path=None):
+        """
+        remote_path must contains directory only, and is case-sensitive
+
+        example:
+            remote_path="sample_folder/"
+
+        directory of remote_path must exists in remote to avoid unexpected errors
+        """
+        file_name = file_path.split('/')[-1]
         data = open(file_path, "rb").read()
-        poster.do_patch_http_response_read()
-        res=poster.post_multipart(host, 8080, '/files', [], [('newfile', 'news.mp3', data)])
-        print res.read()
-        print res.status
+        if remote_path!=None and remote_path[-1]=='/':
+            file_name=remote_path+file_name
+        res=poster.post_multipart(self.host, 8080, '/files', [], [('newfile', file_name, data)])
+        return res.status
 
 
-    def upload(self, from_file):
-        print 'uploading: ', from_file
-        self.post_multi_encoded_file(from_file)
+    def upload(self, from_file, remote_path=None):
+        print 'uploading: ', from_file,
+        return self.post_multi_encoded_file(from_file, remote_path)
 
 
 if __name__ == '__main__':
-    uploader = FMuploader()
-    uploader.upload('download/aaa.mp3')
-    print 'done!'
+    print 'Nothing to see, go away..'
